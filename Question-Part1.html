@@ -40,5 +40,37 @@
         </p>
     </form>
 </body>
+<script>
+    let identification = {
+        firstName:'',
+        lastName:'',
+        gender:'',
+        employment:[],
+        carType:''
+    }
+
+    document.querySelector('#carType').addEventListener('change', ({target}) =>{
+        identification['carType'] = (target.selectedIndex === 0)? '' : target[target.selectedIndex].value
+    })
+
+    document.querySelectorAll('input').forEach( item => {
+        (item.type !== 'button')? item.addEventListener('change', () => {
+                                    (item.name === "")? identification[item.id] = item.value
+                                                      : (item.type !== 'checkbox')? identification[item.name] = item.value
+                                                      : (item.checked)? identification[item.name].push(item.value)
+                                                      : identification[item.name] = identification[item.name].filter( e => e !== item.value)
+                                  })
+                                : item.addEventListener('click', () => {
+                                    let missing = []
+                                    
+                                    Object.entries(identification).forEach( object => {
+                                        if (object[1].length === 0) missing.push(object[0][0].toUpperCase() + object[0].slice(1))
+                                    })
+
+                                    if(missing.length !== 0) window.alert(`The following mandatory field is missing:\n${missing.join('\n')}`)
+                                    else window.alert(`Form has been submitted!`); window.location.reload();
+                                  })
+    })
+</script>
 </html>
 
