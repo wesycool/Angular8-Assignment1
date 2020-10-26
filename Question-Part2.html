@@ -8,8 +8,8 @@
 <body>
     <p>Please enter the following mandatory information</p>
     <form name="identification">
-        <p>First Name:<input type="text" id="firstName" /></p>
-        <p>Last Name:<input type="text" id="lastName" /></p>
+        <p>First Name:<input type="text" id="firstName" /><span id="spanFirstName"/></p>
+        <p>Last Name:<input type="text" id="lastName" /><span id="spanLastName"/></p>
 
         <p>Gender Type:<span id="spanGender"/></p>
         
@@ -23,7 +23,7 @@
 
 
 
-        <p>Current car brand:</p>
+        <p>Current car brand:<span id="spanCarType"/></p>
 
         <select id="carType">
             <option value="selectcard">not selected</option>
@@ -38,5 +38,46 @@
         </p>
     </form>
 </body>
+
+<script>
+    let identification = {
+        firstName:'',
+        lastName:'',
+        gender:'',
+        employment:[],
+        carType:''
+    }
+
+    document.querySelector('#carType').addEventListener('change', ({target}) =>{
+        identification['carType'] = (target.selectedIndex === 0)? '' : target[target.selectedIndex].value
+    })
+
+    document.querySelectorAll('input').forEach( item => {
+        (item.type !== 'button')? item.addEventListener('change', () => {
+                                    (item.name === "")? identification[item.id] = item.value
+                                                      : (item.type !== 'checkbox')? identification[item.name] = item.value
+                                                      : (item.checked)? identification[item.name].push(item.value)
+                                                      : identification[item.name] = identification[item.name].filter( e => e !== item.value)
+                                  })
+                                : item.addEventListener('click', () => {
+                                    let missing = []
+                                    
+                                    Object.entries(identification).forEach( object => {
+                                        const objectUpper = object[0][0].toUpperCase() + object[0].slice(1)
+                                        const spanWarning = document.querySelector(`#${'span' + objectUpper}`)
+                                        const inputField = document.querySelector(['gender','employment'].includes(object[0])? `#${object[0]}1` : `#${object[0]}`)
+    
+                                        if (object[1].length === 0) missing.push(objectUpper); 
+
+                                        spanWarning.setAttribute('style','background-color: red')
+                                        spanWarning.textContent = (object[1].length !== 0)? '' 
+                                                                : (object[0] === 'carType')? 'Please select a car type'
+                                                                : `${objectUpper.match(/[A-Z][a-z]+/g).join(' ')} is a mandatory ${inputField.type === 'text' ? 'field': inputField.type + ' button'}`
+                                    })
+
+                                    if (missing.length === 0) {window.alert(`Form has been submitted!`); window.location.reload();}
+                                  })
+    })
+</script>
 </html>
 
